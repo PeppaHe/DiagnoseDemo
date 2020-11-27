@@ -1,0 +1,288 @@
+﻿@using TestProject.Models
+
+@{
+    Layout = "";
+}
+<style>
+    form input {
+       display:inline-block;
+    }
+    /*img {
+        width:100px;
+        height:100px;
+    }*/
+</style>
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+ 
+</head>
+<body>
+    <div> 
+        <form method="get">
+            <input type="text" name="PersonName" id="PersonName"  placeholder="输入患者姓名" />
+            <input type="button" value="查询" id="submit"/>      
+        </form>
+    </div>
+    
+
+    <div>
+        <table rules=rows>
+           <thead>
+               <tr>
+                   <th>PersonNO</th>
+                   <th>FeeSerialNo</th>
+                   <th>PersonName</th>
+                   <th>Age</th>
+                   <th>SexID</th>
+                   <th>FeeItemName</th>
+                   <th>FeeItemID</th>
+                   <th>DepartID</th>
+               </tr>
+           </thead>
+            <tbody id="table">
+                <tr id="row">
+                    <td id="column"></td> 
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+
+    <div style="width:100%; height:2px;margin-top:100px; background-color: black"></div>
+    <form method="post" >
+        编号：<input id="PersonNO" />
+        排队：<input id="FeeSerialNo" /><br />
+        姓名：<input id="PersonNames" />
+        年龄：<input id="Age" /><br />
+        性别：<input id="SexID" />
+        项目：<input id="FeeItemName" /><br />
+        费用编号：<input id="FeeItemID" />
+        部门编号：<input id="DepartID" /><br />
+        科室影像：<input id="Office_img" type="file" onchange="upImg()"><br />
+        <img id="img1" src=""/>
+        诊断结论：<input id="Solution" /><br />
+        检查医生：<input id="Doctor" />
+        检查时间：<input id="Check_time" type="date"/><br />
+        检查图像：<input id="Check_img" type="file" onchange="upImg2()"/>
+        <img id="img2" src="" /><br />
+        <input type="submit" id="save" value="保存" style="width: 60px"/>
+    </form>
+
+
+
+    <div style="width:100%; height:2px;margin-top:50px; background-color: black"></div>
+    <div>
+        <form method="get">
+            <input type="text" name="PersonName2" id="PersonName2" placeholder="输入患者姓名" />
+            <input type="button" value="查询" id="submit2" />
+        </form>
+    </div>
+    @*查询所有信息*@
+    <div>
+        <table rules=rows >
+            <thead>
+                <tr style="">
+                    <th>PersonNO</th>
+                    <th>FeeSerialNo</th>
+                    <th>PersonName</th>
+                    <th>Age</th>
+                    <th>SexID</th>
+                    <th>FeeItemName</th>
+                    <th>FeeItemID</th>
+                    <th>DepartID</th>
+                    @*<th>Office_img</th>*@
+                    <th>Solution</th>
+                    <th>Doctor</th>
+                    <th>Check_time</th>
+                    @*<th>Check_img</th>*@
+                </tr>
+            </thead>
+            <tbody id="table2">
+                <tr id="row">
+                    <td id="column"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    
+    <div style="width:100%; height:2px;margin-top:50px; background-color: black"></div>
+    <div style="float:left">PersonNo:</div> <div id="PersonNOExa" ></div><br />
+    <div style="float:left">FeeSerialNo:</div><div id="FeeSerialNoExa"></div><br />
+    <div style="float:left">PersonName:</div><div id="PersonNameExa"></div><br />
+    <div style="float:left">Age:</div><div id="AgeExa"></div><br />
+    <div style="float:left">SexID:</div><div id="SexIDExa"></div><br />
+    <div style="float:left">FeeItemName:</div><div id="FeeItemNameExa"></div><br />
+    <div style="float:left">FeeItemID:</div><div id="FeeItemIDExa"></div><br />
+    <div style="float:left">DepartID:</div><div id="DepartIDExa"></div><br />
+    <div style="float:left">Office_img:</div><div><img src="" id="Office_imgExa"/></div><br />
+    <div style="float:left">Solution:</div><div id="SolutionExa"></div><br />
+    <div style="float:left">Doctor:</div><div id="DoctorExa"></div><br />
+    <div style="float:left">Check_time:</div><div id="Check_timeExa"></div><br />
+    <div style="float:left">Check_img:</div><div ><img src="" id="Check_imgExa"/></div>
+    
+
+    <script type="text/javascript">
+        //点击数据显示在下面
+        var examinData = [];
+        function rowclick(id) {
+            $("#AddInfo").empty();
+            for (var index = 0; index < examinData.length; index++) {
+                if (examinData[index].FeeSerialNo == id) {
+                    //console.log(examinData[index]);
+                    setVal(examinData[index]);
+                }
+            }
+        };
+        
+        //预览图片
+        var office_img_path = "";
+        var check_img_path = "";
+        function upImg() {
+            console.log($("#Office_img"));
+            var file = $("#Office_img")[0].files[0];
+            var fi = new FileReader(file);
+            fi.readAsDataURL(file);  
+            var picString;
+            fi.onload = function (ret) {
+                picString = fi.result;
+                $.post("@Url.Action("UploadImg")", { name: file.name, fileBas64: picString }, function (data, state) {
+                    $("#img1").attr("src", data);
+                    office_img_path = data;
+                    $("#img1").attr("width", 70);
+                    $("#img1").attr("height", 70);
+                });
+
+        }
+        }
+        function upImg2() {
+            console.log($("#Check_img"));
+            var file = $("#Check_img")[0].files[0];
+            var fi = new FileReader(file);
+            fi.readAsDataURL(file);  
+            var picString;
+            fi.onload = function (ret) {
+                picString = fi.result;
+                $.post("@Url.Action("UploadImg")", { name: file.name, fileBas64: picString }, function (data, state) {
+                    $("#img2").attr("src", data);
+                    check_img_path = data;
+                    $("#img2").attr("width", 70);
+                    $("#img2").attr("height", 70);
+                });
+
+        }
+        }
+        function setVal(data) {
+            $('#PersonNO').val(data.PersonNO);
+            $('#FeeSerialNo').val(data.FeeSerialNo);
+            $('#PersonNames').val(data.PersonName);
+            $('#Age').val(data.Age);
+            $('#SexID').val(data.SexID);
+            $('#FeeItemName').val(data.FeeItemName);
+            $('#FeeItemID').val(data.FeeItemID);
+            $('#DepartID').val(data.DepartID);
+        };
+
+        //转换日期的方法
+        function GetDateFormat(str) {
+            return new Date(parseInt(str.substr(6, 13))).toLocaleDateString();
+        };
+
+
+        $(function () {
+
+            //根据名字搜索信息
+            $("#submit").click(function () {
+                var name = $("#PersonName").val();
+                var data = { name: name };
+                $("#table").empty();
+                $.get("@Url.Action("GetPatients")", data, function (data, status) {
+                    examinData = data;
+                    for (var index = 0; index < data.length; index++) {
+                        $("#table").append("<tr onclick='rowclick(" + data[index].FeeSerialNo + ")'>" + "<th onclick='rowclick(" + data[index].FeeSerialNo + ")'>" + data[index].PersonNO + "<th>" + data[index].FeeSerialNo + "<th>" + data[index].PersonName + "<th>" + "</tr>");
+                    }
+                }, "json");
+
+            });
+       
+      
+            //保存医生处理过后的信息
+            $("#save").click(function (upImg) {
+                var PersonNO = $("#PersonNO").val();
+                var FeeSerialNo = $("#FeeSerialNo").val();
+                var PersonName = $("#PersonName").val();
+                var Age = $("#Age").val();
+                var SexID = $("#SexID").val();
+                var FeeItemName = $("#FeeItemName").val();
+                var FeeItemID = $("#FeeItemID").val();
+                var DepartID = $("#DepartID").val();
+                var Office_img = office_img_path;
+                var Solution = $("#Solution").val();
+                var Doctor = $("#Doctor").val();
+                var Check_time = $("#Check_time").val();
+                var Check_img = check_img_path;
+                var data = {
+                    PersonNO: PersonNO, FeeSerialNo: FeeSerialNo, PersonName: PersonName, Age: Age, SexID: SexID, FeeItemName: FeeItemName, FeeItemID: FeeItemID,
+                    DepartID: DepartID, Office_img: Office_img, Solution: Solution, Doctor: Doctor, Check_time: Check_time, Check_img: Check_img,
+                };
+
+                $.post("@Url.Action("SavePatient")",data, function (data, status) {
+
+                }, "json");
+            });
+        })      
+
+        //根据名字搜索全部信息
+        $("#submit2").click(function () {
+
+            var name2 = $("#PersonName2").val();
+            var data = { name2: name2 };
+            $("#table2").empty();
+            $.get("@Url.Action("GetPatientsAllInfo")", data, function (data, status) {
+                examinData2 = data;
+                for (var index = 0; index < data.length; index++) {
+                    $("#table2").append("<tr onclick='rowclick2(" + data[index].Id + ")'>" + "<th>" + data[index].PersonNO + "<th>" + data[index].FeeSerialNo + "<th>" +
+                        data[index].PersonName + "<th>" + data[index].Age + "<th>" + data[index].SexID + "<th>" + data[index].FeeItemName + "<th>" + data[index].FeeItemID + "<th>" +
+                        data[index].DepartID + "<th>"  + data[index].Solution + "<th>" +
+                        data[index].Doctor + "<th>" + GetDateFormat(data[index].Check_time) + "<th>" + "</tr>");
+                }
+            }, "json");
+        }); ""
+
+        //点击显示一条完整信息
+        var examinData2 = [];
+        function rowclick2(id) {
+            for (var index2 = 0; index2 < examinData2.length; index2++) {
+                if (examinData2[index2].Id == id) {
+                    setVal2(examinData2[index2]);
+                }
+            }
+        };
+        function setVal2(data) {
+            $('#PersonNOExa').html(data.PersonNO);          
+            $('#FeeSerialNoExa').html(data.FeeSerialNo);
+            $('#PersonNameExa').html(data.PersonName);
+            $('#AgeExa').html(data.Age);
+            $('#SexIDExa').html(data.SexID);
+            $('#FeeItemNameExa').html(data.FeeItemName);
+            $('#FeeItemIDExa').html(data.FeeItemID);
+            $('#DepartIDExa').html(data.DepartID);
+            $('#SolutionExa').html(data.Solution);
+            $('#DoctorExa').html(data.Doctor);
+            $('#Check_timeExa').html(GetDateFormat(data.Check_time));
+            $('#Check_imgExa').attr("src", data.Check_img);
+            $("#Check_imgExa").attr("width", 70);
+            $("#Office_imgExa").attr("src", data.Office_img);
+            $("#Office_imgExa").attr("width", 70);
+        }
+
+    </script>
+
+  
+</body>
+</html>

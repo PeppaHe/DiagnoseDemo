@@ -1,0 +1,45 @@
+﻿
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>PatientList</title>
+</head>
+<body>
+    <div> 
+        <table>
+            <tr>
+                <th>PersonNO</th>
+                <th>FeeSerialNo</th>
+                <th>PersonName</th>
+                <th>Age</th>
+                <th>SexID</th>
+                <th>FeeItemName</th>
+                <th>FeeItemID</th>
+                <th>DepartID</th>
+            </tr>
+            @{
+                foreach (var item in @Model)
+                {
+                    <tr>
+                        <th>@item.PersonNO</th>
+                        <th>@item.FeeSerialNo</th>
+                        <th>@item.PersonName</th>
+                        <th>@item.Age</th>
+                        <th>@item.SexID</th>
+                        <th>@item.FeeItemName</th>
+                        <th>@item.FeeItemID</th>
+                        <th>@item.DepartID</th>
+                    </tr>
+                }
+            }
+        </table>
+    </div>
+</body>
+</html>
